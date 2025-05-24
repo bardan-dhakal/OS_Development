@@ -58,3 +58,61 @@ We built a **simple x86 bootloader** that:
 nasm -f bin bootstrap.asm -o bootstrap.o
 nasm -f bin test_kernel.asm -o test_kernel.o
 
+### 4️⃣ Creating the Floppy Image
+```bash
+dd if=/dev/zero of=floppy.img bs=512 count=2880
+dd if=bootstrap.o of=floppy.img conv=notrunc
+dd if=test_kernel.o of=floppy.img bs=512 seek=1 conv=notrunc
+```
+**Note**: `seek=1` puts the kernel in sector 1.
+
+---
+
+### 5️⃣ Configuring Bochs (`bochsrc.txt`)
+Initially encountered `ROM: System BIOS must end at 0xfffff`.
+
+**Fix**: Use BIOS start at `0xE0000` to fit BIOS size (128KB) under 1MB.
+
+```ini
+romimage: file=/usr/share/bochs/BIOS-bochs-latest, address=0xE0000
+vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest
+
+floppya: 1_44=floppy.img, status=inserted
+boot: a
+
+log: OSDev.log
+display_library: x
+debug: action=ignore
+```
+
+---
+
+### 6️⃣ Running and Debugging
+```bash
+make clean
+make run
+```
+- Bochs starts the bootloader and loads the kernel.
+- If stuck at debugger (`<bochs:1>`), type `c` to continue.
+
+---
+
+## 🚨 Common Errors and Fixes
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `ROM: System BIOS must end at 0xfffff` | BIOS file too large or misaligned | Use `address=0xE0000` for a 128KB BIOS |
+| Stuck at BIOS jump `(invalid)` | BIOS file missing or misconfigured | Verify path and size of `BIOS-bochs-latest` |
+| Debugger prompt `<bochs:1>` | Debug mode enabled | Add `debug: action=ignore` |
+| GUI crashes in WSL | WSLg X11 instability | Use `display_library: sdl` or `nogui` |
+| Kernel not running | Bootloader didn’t load sector 1 | Verify `int 13h` loads with `DL=0x00` |
+| No print output | Incorrect segment setup or missing `int 10h` | Check `mov ax, 07C0h`, `mov ds, ax`, `mov ah, 0Eh` |
+
+---
+
+## 🔚 Summary
+- Created a bootloader that loads a kernel and runs on Bochs + WSL.
+- Debugged BIOS size errors and configured a valid `bochsrc.txt`.
+- Confirmed kernel loading and output.
+- Documented fixes for common pitfalls.
+
