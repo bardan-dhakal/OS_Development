@@ -3,7 +3,7 @@ vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest
 
 floppya: 1_44=floppy.img, status=inserted
 boot: a
-
 log: OSDev.log
-display_library: sdl
+display_library: x
 debug: action=ignore
+megs: 32
