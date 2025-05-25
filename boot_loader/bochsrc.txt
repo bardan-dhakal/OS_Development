@@ -5,5 +5,10 @@ boot: a
 log: OSDev.log
 display_library: x
 debug: action=ignore
+info: action=ignore
+error: action=ignore
+panic: action=fatal
 megs: 32
+
+# This should prevent debugger from starting
 magic_break: enabled=0
