@@ -5,6 +5,10 @@
 ;	Operating Systems Development
 ;*********************************************
 
+
+[org 0x7C00]
+[bits 16]
+
 ; Debug to check if Bochs is running the Bootloader
 mov ah, 0Eh
 mov al, 'B'
