@@ -15,6 +15,14 @@ mov al, 'B'
 int 0x10
 
 start:
+    ; *** CRITICAL: Set up stack first ***
+    cli 
+    mov ax, 0x9000
+    mov ss, ax
+    mov sp, 0xFFFF
+    sti
+
+    ; Set up data segment
     mov ax, 07C0h
     mov ds, ax
 
